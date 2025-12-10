@@ -2,6 +2,7 @@ import { WaitlistForm } from "@/components/waitlist-form";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Bot } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { CountdownTimer } from "@/components/countdown-timer";
 
 const faqs = [
   {
@@ -27,6 +28,8 @@ const faqs = [
 ];
 
 export default function Home() {
+  const launchDate = "2025-12-20T00:00:00";
+
   return (
     <div className="bg-background text-foreground font-body">
       <div className="absolute inset-0 z-0 opacity-20" style={{ backgroundImage: `radial-gradient(circle at 25% 25%, hsl(var(--primary)) 0%, transparent 50%), radial-gradient(circle at 75% 75%, hsl(var(--primary) / 0.5) 0%, transparent 50%)`}} />
@@ -45,7 +48,11 @@ export default function Home() {
           </p>
         </div>
 
-        <WaitlistForm />
+        <CountdownTimer targetDate={launchDate} />
+
+        <div className="my-8">
+          <WaitlistForm />
+        </div>
 
         <div className="my-12 w-full max-w-2xl">
           <div className="flex items-center gap-4">
@@ -68,10 +75,10 @@ export default function Home() {
           <Accordion type="single" collapsible className="w-full text-center md:text-left">
             {faqs.map((faq, i) => (
               <AccordionItem value={`item-${i+1}`} key={i} className="border-b border-white/10">
-                <AccordionTrigger className="text-lg py-6 hover:no-underline text-center md:text-left">
+                <AccordionTrigger className="text-lg py-6 hover:no-underline text-center md:text-left justify-center md:justify-between">
                   {faq.question}
                 </AccordionTrigger>
-                <AccordionContent className="text-muted-foreground text-base pb-6">
+                <AccordionContent className="text-muted-foreground text-base pb-6 text-center md:text-left">
                   {faq.answer}
                 </AccordionContent>
               </AccordionItem>
