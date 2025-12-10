@@ -63,7 +63,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="w-full max-w-2xl mt-8">
+        <div className="w-full max-w-2xl mt-8 mb-16">
           <h2 className="text-3xl font-bold mb-8 font-serif italic">Frequently Asked Questions</h2>
           <Accordion type="single" collapsible className="w-full text-left">
             {faqs.map((faq, i) => (
@@ -79,10 +79,6 @@ export default function Home() {
           </Accordion>
         </div>
       </main>
-      <footer className="relative z-10 container mx-auto text-muted-foreground py-6 flex justify-between text-sm w-full max-w-6xl">
-        <p>Join the waitlist to get early access</p>
-        <p>Designed by Wize</p>
-      </footer>
     </div>
   );
 }
