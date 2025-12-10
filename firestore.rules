@@ -94,7 +94,7 @@ service cloud.firestore {
     match /timer_state/{timerStateId} {
       allow get: if true;
       allow list: if true;
-      allow create: if isSignedIn();
+      allow create: if true;
       allow update: if isSignedIn() && resource != null;
       allow delete: if isSignedIn() && resource != null;
     }
