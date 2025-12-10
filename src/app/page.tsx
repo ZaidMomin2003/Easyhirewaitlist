@@ -28,7 +28,8 @@ const faqs = [
 ];
 
 export default function Home() {
-  const launchDate = "2025-12-20T00:00:00";
+  const launchDate = new Date();
+  launchDate.setDate(launchDate.getDate() + 10);
 
   return (
     <div className="bg-background text-foreground font-body">
@@ -48,7 +49,8 @@ export default function Home() {
           </p>
         </div>
 
-        <CountdownTimer targetDate={launchDate} />
+        <h2 className="text-2xl font-semibold tracking-tight text-muted-foreground mb-4">Launching in...</h2>
+        <CountdownTimer targetDate={launchDate.toISOString()} />
 
         <div className="my-8">
           <WaitlistForm />
