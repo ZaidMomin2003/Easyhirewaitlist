@@ -3,8 +3,8 @@ import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 
 export const metadata: Metadata = {
-  title: 'Pilot Template Waitlist',
-  description: 'Join the waitlist for the Pilot Template.',
+  title: 'Easyhire',
+  description: 'The smartest way to hire. AI-powered campaigns to find the perfect candidate.',
 };
 
 export default function RootLayout({
