@@ -1,6 +1,7 @@
 import { WaitlistForm } from "@/components/waitlist-form";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Bot } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const faqs = [
   {
@@ -52,9 +53,13 @@ export default function Home() {
             <span className="text-muted-foreground text-sm tracking-widest">FROM THE DEVELOPERS OF</span>
             <div className="flex-grow border-t border-muted-foreground/20"></div>
           </div>
-          <div className="flex justify-center items-center gap-8 md:gap-16 mt-6 text-muted-foreground">
-              <p className="text-2xl font-semibold italic">wisdomis.fun</p>
-              <p className="text-2xl font-semibold italic">Talxify.space</p>
+          <div className="flex justify-center items-center gap-4 md:gap-8 mt-6">
+            <Button variant="link" asChild className="text-2xl font-semibold italic text-muted-foreground">
+              <a href="https://wisdomis.fun" target="_blank" rel="noopener noreferrer">wisdomis.fun</a>
+            </Button>
+            <Button variant="link" asChild className="text-2xl font-semibold italic text-muted-foreground">
+              <a href="https://talxify.space" target="_blank" rel="noopener noreferrer">Talxify.space</a>
+            </Button>
           </div>
         </div>
 
