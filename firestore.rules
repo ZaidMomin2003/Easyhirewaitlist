@@ -1,3 +1,4 @@
+
 /**
  * Core Philosophy:
  * This ruleset establishes a multi-layered security model. It provides public write
@@ -78,21 +79,21 @@ service cloud.firestore {
 
     /**
      * @description
-     *   Stores a shared timer state that can be read and modified by any
-     *   authenticated user. This enables real-time synchronization of a
-     *   timer across multiple devices and users.
+     *   Stores a shared timer state that can be read by anyone but only modified
+     *   by authenticated users. This enables real-time synchronization of a
+     *   timer across multiple devices and users while protecting it from anonymous writes.
      * @path
      *   /timer_state/{timerStateId}
      * @allow
-     *   (update) Any authenticated user changes the timer's 'paused' state.
+     *   (get) Any visitor, authenticated or not, reads the timer.
      * @deny
      *   (create) An unauthenticated, anonymous user attempts to create a timer state.
      * @principle
-     *   Grants access to a shared resource for a community of authenticated users.
+     *   Grants public read access for shared data, but write access is restricted.
      */
     match /timer_state/{timerStateId} {
-      allow get: if isSignedIn();
-      allow list: if isSignedIn();
+      allow get: if true;
+      allow list: if true;
       allow create: if isSignedIn();
       allow update: if isSignedIn() && resource != null;
       allow delete: if isSignedIn() && resource != null;
