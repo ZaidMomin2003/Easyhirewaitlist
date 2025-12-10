@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { doc } from 'firebase/firestore';
 import { useDoc, useFirestore, useMemoFirebase } from '@/firebase';
+import { setDocumentNonBlocking } from '@/firebase/non-blocking-updates';
 
 type CountdownTimerProps = {
   // No props needed as it will get state from Firestore
@@ -64,11 +65,21 @@ export function CountdownTimer({}: CountdownTimerProps) {
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
   useEffect(() => {
-    if (isLoading || !timerState) {
-      // While loading or if no timer state exists, show all zeros
+    if (isLoading) {
       setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
       return;
-    };
+    }
+
+    if (!timerState && timerStateRef) {
+      // If timer doesn't exist, create it.
+      const newStartTime = new Date().getTime();
+      const newDuration = 11 * 24 * 60 * 60 * 1000; // 11 days in milliseconds
+      setDocumentNonBlocking(timerStateRef, {
+        startTime: newStartTime,
+        duration: newDuration,
+        paused: false,
+      }, { merge: false });
+    }
     
     // Set initial time left
     setTimeLeft(calculateTimeLeft(timerState));
@@ -78,7 +89,7 @@ export function CountdownTimer({}: CountdownTimerProps) {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [timerState, isLoading]);
+  }, [timerState, isLoading, timerStateRef]);
 
 
   if (isLoading) {
