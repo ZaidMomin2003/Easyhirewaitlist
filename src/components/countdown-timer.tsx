@@ -1,15 +1,30 @@
 "use client";
 
 import { useState, useEffect } from 'react';
+import { doc } from 'firebase/firestore';
+import { useDoc, useFirestore, useMemoFirebase } from '@/firebase';
 
 type CountdownTimerProps = {
-  targetDate: string;
+  // No props needed as it will get state from Firestore
 };
 
 type TimeUnit = "Days" | "Hours" | "Minutes" | "Seconds";
 
-const calculateTimeLeft = (targetDate: string) => {
-  const difference = +new Date(targetDate) - +new Date();
+interface TimerState {
+  startTime: number;
+  duration: number;
+  paused: boolean;
+}
+
+const calculateTimeLeft = (timerState: TimerState | null) => {
+  if (!timerState || timerState.paused) {
+    return { days: 0, hours: 0, minutes: 0, seconds: 0 };
+  }
+
+  const now = new Date().getTime();
+  const endTime = timerState.startTime + timerState.duration;
+  const difference = endTime - now;
+
   let timeLeft = {
     days: 0,
     hours: 0,
@@ -38,23 +53,35 @@ const TimeCard = ({ value, unit }: { value: number; unit: TimeUnit }) => (
   </div>
 );
 
-export function CountdownTimer({ targetDate }: CountdownTimerProps) {
+export function CountdownTimer({}: CountdownTimerProps) {
+  const firestore = useFirestore();
+  const timerStateRef = useMemoFirebase(() => 
+    firestore ? doc(firestore, 'timer_state', 'main-timer') : null
+  , [firestore]);
+  
+  const { data: timerState, isLoading } = useDoc<TimerState>(timerStateRef);
+  
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
-  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    setIsClient(true);
+    if (isLoading || !timerState) {
+      // While loading or if no timer state exists, show all zeros
+      setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+      return;
+    };
+    
     // Set initial time left
-    setTimeLeft(calculateTimeLeft(targetDate));
+    setTimeLeft(calculateTimeLeft(timerState));
 
     const timer = setInterval(() => {
-      setTimeLeft(calculateTimeLeft(targetDate));
+      setTimeLeft(calculateTimeLeft(timerState));
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [targetDate]);
+  }, [timerState, isLoading]);
 
-  if (!isClient) {
+
+  if (isLoading) {
     return (
         <div className="flex items-center justify-center space-x-2 md:space-x-4 my-8">
             <TimeCard value={0} unit="Days" />

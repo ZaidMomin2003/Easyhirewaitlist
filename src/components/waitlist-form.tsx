@@ -5,13 +5,15 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { z } from "zod";
 import { CheckCircle, Loader2 } from "lucide-react";
+import { collection, serverTimestamp } from 'firebase/firestore';
 
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { WaitlistFormSchema } from "@/lib/definitions";
-import { addToWaitlist } from "@/app/actions";
 import { useToast } from "@/hooks/use-toast";
+import { useFirestore } from "@/firebase";
+import { addDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 
 type WaitlistFormValues = z.infer<typeof WaitlistFormSchema>;
 
@@ -19,6 +21,7 @@ export function WaitlistForm() {
   const [isPending, startTransition] = useTransition();
   const [isSuccess, setIsSuccess] = useState(false);
   const { toast } = useToast();
+  const firestore = useFirestore();
 
   const form = useForm<WaitlistFormValues>({
     resolver: zodResolver(WaitlistFormSchema),
@@ -31,13 +34,18 @@ export function WaitlistForm() {
 
   const onSubmit = (values: WaitlistFormValues) => {
     startTransition(async () => {
-      const result = await addToWaitlist(values);
-      if (result.success) {
+      try {
+        const waitlistCollection = collection(firestore, 'waitlist_entries');
+        await addDocumentNonBlocking(waitlistCollection, {
+          ...values,
+          submissionTimestamp: serverTimestamp(),
+        });
         setIsSuccess(true);
-      } else {
+      } catch (error) {
+        console.error("Error adding to waitlist: ", error);
         toast({
           title: "An error occurred",
-          description: result.message,
+          description: "Could not join the waitlist. Please try again later.",
           variant: "destructive",
         });
       }
@@ -95,7 +103,7 @@ export function WaitlistForm() {
               )}
             />
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-[1fr,auto] gap-4">
           <FormField
             control={form.control}
             name="email"
@@ -114,7 +122,7 @@ export function WaitlistForm() {
               </FormItem>
             )}
           />
-          <Button type="submit" className="h-12 w-full text-base" disabled={isPending}>
+          <Button type="submit" className="h-12 w-full md:w-auto text-base px-8" disabled={isPending}>
             {isPending ? <Loader2 className="animate-spin" /> : "Get Notified"}
           </Button>
         </div>
