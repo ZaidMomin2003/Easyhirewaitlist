@@ -65,10 +65,10 @@ export default function Home() {
 
         <div className="w-full max-w-2xl mt-8 mb-16">
           <h2 className="text-3xl font-bold mb-8 font-serif italic">Frequently Asked Questions</h2>
-          <Accordion type="single" collapsible className="w-full text-left">
+          <Accordion type="single" collapsible className="w-full text-center md:text-left">
             {faqs.map((faq, i) => (
               <AccordionItem value={`item-${i+1}`} key={i} className="border-b border-white/10">
-                <AccordionTrigger className="text-lg py-6 hover:no-underline">
+                <AccordionTrigger className="text-lg py-6 hover:no-underline text-center md:text-left">
                   {faq.question}
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground text-base pb-6">
