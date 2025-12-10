@@ -7,7 +7,7 @@ import type { z } from "zod";
 import { CheckCircle, Loader2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { WaitlistFormSchema } from "@/lib/definitions";
 import { addToWaitlist } from "@/app/actions";
@@ -23,20 +23,15 @@ export function WaitlistForm() {
   const form = useForm<WaitlistFormValues>({
     resolver: zodResolver(WaitlistFormSchema),
     defaultValues: {
+      name: "",
       email: "",
+      business: "",
     },
   });
 
   const onSubmit = (values: WaitlistFormValues) => {
-    // Add dummy values for name and business to satisfy the schema
-    const dataWithDummies = {
-      ...values,
-      name: 'N/A',
-      business: 'N/A',
-    };
-
     startTransition(async () => {
-      const result = await addToWaitlist(dataWithDummies);
+      const result = await addToWaitlist(values);
       if (result.success) {
         setIsSuccess(true);
       } else {
@@ -63,30 +58,64 @@ export function WaitlistForm() {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="w-full max-w-lg">
-        <div className="flex gap-2">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="w-full max-w-lg space-y-4">
+        <div className="grid grid-cols-1 gap-4">
             <FormField
               control={form.control}
-              name="email"
+              name="name"
               render={({ field }) => (
-                <FormItem className="flex-grow">
+                <FormItem>
                   <FormControl>
                     <Input 
-                      type="email" 
-                      placeholder="Enter your email..." 
+                      placeholder="Your Name" 
                       {...field} 
                       disabled={isPending} 
-                      className="bg-secondary/50 border-white/20 h-14 text-lg"
+                      className="bg-secondary/50 border-white/20 h-12 text-base"
                     />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-          <Button type="submit" className="h-14 text-lg px-8" disabled={isPending}>
-            {isPending ? <Loader2 className="animate-spin" /> : "Get Notified"}
-          </Button>
+            <FormField
+              control={form.control}
+              name="business"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <Input 
+                      placeholder="Business Name" 
+                      {...field} 
+                      disabled={isPending} 
+                      className="bg-secondary/50 border-white/20 h-12 text-base"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <Input 
+                      type="email" 
+                      placeholder="Email Address" 
+                      {...field} 
+                      disabled={isPending} 
+                      className="bg-secondary/50 border-white/20 h-12 text-base"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
         </div>
+        <Button type="submit" className="h-14 w-full text-lg px-8" disabled={isPending}>
+          {isPending ? <Loader2 className="animate-spin" /> : "Get Notified"}
+        </Button>
       </form>
     </Form>
   );
