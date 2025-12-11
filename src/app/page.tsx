@@ -77,7 +77,7 @@ export default function Home() {
         <div className="max-w-2xl">
           <h1 className="text-4xl md:text-6xl font-bold mb-4 font-headline tracking-tight">The Smartest Way to Hire. Finally.</h1>
           <p className="text-lg text-muted-foreground mb-8">
-            Easyhire is an AI platform for B2B businesses to create intelligent hiring campaigns. From resume tests to human-like AI interviews, we find you the perfect candidate.
+            Easyhire is an AI platform for B2B businesses to create intelligent hiring campaigns. From resume tests to human-like AI interviews, we find you the perfect candidate—10x faster and 100x more cost-effective.
           </p>
         </div>
 
