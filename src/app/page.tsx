@@ -1,7 +1,8 @@
 import { WaitlistForm } from "@/components/waitlist-form";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Bot } from "lucide-react";
+import { Bot, BrainCircuit, FileText, BarChart3, Users, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const faqs = [
   {
@@ -26,6 +27,34 @@ const faqs = [
   }
 ];
 
+const features = [
+  {
+    icon: <BrainCircuit className="w-8 h-8 text-primary" />,
+    title: "Human-like AI Interviews",
+    description: "Engage candidates with conversational AI that goes beyond resumes to assess skills and cultural fit."
+  },
+  {
+    icon: <FileText className="w-8 h-8 text-primary" />,
+    title: "Customizable Skill Tests",
+    description: "Tailor assessments for any role, from coding challenges to written tests, to find the perfect match."
+  },
+  {
+    icon: <Users className="w-8 h-8 text-primary" />,
+    title: "For All Roles",
+    description: "Flexible enough for technical positions, yet perfect for sales, marketing, and other non-technical roles."
+  },
+  {
+    icon: <BarChart3 className="w-8 h-8 text-primary" />,
+    title: "In-Depth Analytics",
+    description: "Receive comprehensive reports with scores, transcripts, and AI analysis to make data-driven decisions."
+  },
+  {
+    icon: <Zap className="w-8 h-8 text-primary" />,
+    title: "Automated Hiring Funnel",
+    description: "Automate the entire top-of-funnel process to save time and ensure you never miss a great candidate."
+  }
+];
+
 export default function Home() {
 
   return (
@@ -46,9 +75,42 @@ export default function Home() {
           </p>
         </div>
 
+        <p className="mb-4 text-sm font-semibold tracking-widest text-primary uppercase animate-pulse">
+          Launching on 21, December 2025
+        </p>
         <div className="my-8">
           <WaitlistForm />
         </div>
+
+        <section className="w-full max-w-5xl my-16">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {features.slice(0, 3).map((feature, i) => (
+              <Card key={i} className="bg-secondary/30 backdrop-blur-sm border-white/10 text-left">
+                <CardHeader className="flex flex-row items-start gap-4">
+                  <div>{feature.icon}</div>
+                  <CardTitle className="text-xl font-bold leading-tight">{feature.title}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground">{feature.description}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6 md:w-2/3 mx-auto">
+             {features.slice(3).map((feature, i) => (
+              <Card key={i} className="bg-secondary/30 backdrop-blur-sm border-white/10 text-left">
+                <CardHeader className="flex flex-row items-start gap-4">
+                  <div>{feature.icon}</div>
+                  <CardTitle className="text-xl font-bold leading-tight">{feature.title}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground">{feature.description}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </section>
+
 
         <div className="my-12 w-full max-w-2xl">
           <div className="flex items-center gap-4">
