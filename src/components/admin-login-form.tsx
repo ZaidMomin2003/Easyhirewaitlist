@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Loader2 } from 'lucide-react';
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
 
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
@@ -11,14 +12,15 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { AdminLoginFormSchema } from '@/lib/definitions';
 import { useAuth } from '@/firebase';
-import { initiateEmailSignIn } from '@/firebase/non-blocking-login';
 import { useTransition } from 'react';
+import { useToast } from '@/hooks/use-toast';
 
 type LoginFormValues = z.infer<typeof AdminLoginFormSchema>;
 
 export function AdminLoginForm() {
   const auth = useAuth();
   const [isPending, startTransition] = useTransition();
+  const { toast } = useToast();
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(AdminLoginFormSchema),
@@ -29,8 +31,50 @@ export function AdminLoginForm() {
   });
 
   const onSubmit = (values: LoginFormValues) => {
-    startTransition(() => {
-      initiateEmailSignIn(auth, values.email, values.password);
+    startTransition(async () => {
+      try {
+        await signInWithEmailAndPassword(auth, values.email, values.password);
+      } catch (error: any) {
+        // If the admin user doesn't exist, create it.
+        if (error.code === 'auth/user-not-found' && values.email === 'admin@example.com') {
+          try {
+            await createUserWithEmailAndPassword(auth, values.email, values.password);
+          } catch (creationError: any) {
+            toast({
+              title: 'Admin Creation Failed',
+              description: creationError.message,
+              variant: 'destructive',
+            });
+          }
+        } else if (error.code === 'auth/invalid-credential') {
+            // This can happen if the user doesn't exist. Let's try creating it for the admin.
+             if (values.email === 'admin@example.com') {
+                try {
+                    await createUserWithEmailAndPassword(auth, values.email, values.password);
+                } catch (creationError: any) {
+                    toast({
+                        title: 'Admin Creation Failed',
+                        description: creationError.message,
+                        variant: 'destructive',
+                    });
+                }
+             } else {
+                toast({
+                    title: 'Login Failed',
+                    description: 'Invalid credentials. Please try again.',
+                    variant: 'destructive',
+                });
+             }
+        }
+        
+        else {
+          toast({
+            title: 'Login Failed',
+            description: error.message,
+            variant: 'destructive',
+          });
+        }
+      }
     });
   };
 
