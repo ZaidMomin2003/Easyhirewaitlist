@@ -35,6 +35,9 @@ export function WaitlistForm() {
   const onSubmit = (values: WaitlistFormValues) => {
     startTransition(async () => {
       try {
+        if (!firestore) {
+          throw new Error("Firestore is not initialized");
+        }
         const waitlistCollection = collection(firestore, 'waitlist_entries');
         await addDocumentNonBlocking(waitlistCollection, {
           ...values,
@@ -58,7 +61,7 @@ export function WaitlistForm() {
         <CheckCircle className="w-24 h-24 text-primary mb-6" />
         <h2 className="text-3xl font-bold mb-2 font-headline">You're on the list!</h2>
         <p className="text-muted-foreground">
-          Thank you for joining the Pilot waitlist. We'll be in touch soon.
+          Thank you for joining the Easyhire waitlist. We'll be in touch soon.
         </p>
       </div>
     );
