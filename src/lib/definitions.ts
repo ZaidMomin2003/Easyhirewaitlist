@@ -5,3 +5,8 @@ export const WaitlistFormSchema = z.object({
   business: z.string().min(1, { message: "Please enter your business name." }),
   email: z.string().email({ message: "Please enter a valid email address." }),
 });
+
+export const ResultsLoginFormSchema = z.object({
+  email: z.string().email({ message: 'Please enter a valid email.' }),
+  password: z.string().min(1, { message: 'Password is required.' }),
+});
