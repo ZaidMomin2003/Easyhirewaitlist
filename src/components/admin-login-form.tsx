@@ -17,6 +17,9 @@ import { useToast } from '@/hooks/use-toast';
 
 type LoginFormValues = z.infer<typeof AdminLoginFormSchema>;
 
+const ADMIN_EMAIL = 'admin@example.com';
+const ADMIN_PASSWORD = 'Zaisha@226194';
+
 export function AdminLoginForm() {
   const auth = useAuth();
   const [isPending, startTransition] = useTransition();
@@ -36,9 +39,14 @@ export function AdminLoginForm() {
         await signInWithEmailAndPassword(auth, values.email, values.password);
       } catch (error: any) {
         // If the admin user doesn't exist, create it.
-        if (error.code === 'auth/user-not-found' && values.email === 'admin@example.com') {
+        if ( (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') && values.email.toLowerCase() === ADMIN_EMAIL ) {
           try {
-            await createUserWithEmailAndPassword(auth, values.email, values.password);
+            await createUserWithEmailAndPassword(auth, ADMIN_EMAIL, ADMIN_PASSWORD);
+             // After creation, try to sign in again silently or let the user re-submit
+             toast({
+                title: 'Admin Account Created',
+                description: 'Please try signing in again.',
+             });
           } catch (creationError: any) {
             toast({
               title: 'Admin Creation Failed',
@@ -46,31 +54,10 @@ export function AdminLoginForm() {
               variant: 'destructive',
             });
           }
-        } else if (error.code === 'auth/invalid-credential') {
-            // This can happen if the user doesn't exist. Let's try creating it for the admin.
-             if (values.email === 'admin@example.com') {
-                try {
-                    await createUserWithEmailAndPassword(auth, values.email, values.password);
-                } catch (creationError: any) {
-                    toast({
-                        title: 'Admin Creation Failed',
-                        description: creationError.message,
-                        variant: 'destructive',
-                    });
-                }
-             } else {
-                toast({
-                    title: 'Login Failed',
-                    description: 'Invalid credentials. Please try again.',
-                    variant: 'destructive',
-                });
-             }
-        }
-        
-        else {
+        } else {
           toast({
             title: 'Login Failed',
-            description: error.message,
+            description: error.message || 'An unknown error occurred.',
             variant: 'destructive',
           });
         }
