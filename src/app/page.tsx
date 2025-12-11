@@ -84,8 +84,8 @@ export default function Home() {
           </p>
         </div>
 
-        <p className="mb-4 text-sm font-semibold tracking-widest text-primary uppercase animate-pulse">
-          Launching on 21, December 2025
+        <p className="mb-4 text-sm font-semibold tracking-wide text-primary uppercase">
+          Launching Soon! Join now for a discount that won't be available again.
         </p>
         <div className="my-8">
           <WaitlistForm />
