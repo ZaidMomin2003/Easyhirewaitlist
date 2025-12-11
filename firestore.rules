@@ -1,127 +1,33 @@
 
-/**
- * Core Philosophy:
- * This ruleset establishes a multi-layered security model. It provides public write
- * access for a waitlist, private synchronized state for authenticated users, and
- * a secure role-based access control (RBAC) system for administrators. The default
- * posture is to deny all access unless explicitly granted.
- *
- * Data Structure:
- * The data is organized into three distinct top-level collections:
- * - /waitlist_entries/{id}: Stores public form submissions.
- * - /timer_state/{id}: A shared document for real-time state synchronization
- *   among all authenticated users.
- * - /roles_admin/{uid}: An access control collection where the existence of a
- *   document signifies that the user is an administrator.
- *
- * Key Security Decisions:
- * - Admin Role Management: The /roles_admin collection is read-only from the client.
- *   This is a critical security measure to ensure that admin roles can only be
- *   assigned or revoked from a trusted server environment or the Firebase Console,
- *   preventing privilege escalation from the client.
- * - Waitlist Privacy: While anyone can submit to the waitlist (/waitlist_entries),
- *   only administrators are permitted to read the submitted data. This protects the
- *   personally identifiable information (PII) of users who have signed up.
- * - Public Listing Disabled: Listing documents is disabled by default on all
- *   collections containing user data to prevent data scraping and user enumeration.
- *   Admins are an exception and can list /waitlist_entries.
- *
- * Denormalization for Authorization:
- * This ruleset uses the "/roles_admin/{uid}" collection as a form of denormalization
- * for authorization. Instead of embedding an 'isAdmin' flag on a user profile, we
- * check for the existence of a document in this dedicated collection. This allows for
- * fast and efficient role checks using `exists()` without needing to read any user
- * profile documents.
- *
- * Structural Segregation:
- * The ruleset leverages separate top-level collections for different data types
- * and access patterns (/waitlist_entries, /timer_state, /roles_admin). This
- * structural segregation creates clear security boundaries and simplifies the
- * rules required for each path, enhancing security and maintainability.
- */
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Helper functions for readable, reusable logic
     function isSignedIn() {
       return request.auth != null;
     }
 
-    // Checks if the requesting user has an admin role document.
     function isAdmin() {
       return exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid));
     }
 
-
-    /**
-     * @description
-     *   Manages user submissions to the waitlist. Allows any user (including
-     *   unauthenticated) to create an entry, but restricts all read and delete
-     *   operations to administrators to protect user privacy.
-     * @path
-     *   /waitlist_entries/{waitlistEntryId}
-     * @allow
-     *   (create) An anonymous visitor successfully submits the waitlist form.
-     * @deny
-     *   (get) A regular signed-in user tries to read someone else's waitlist entry.
-     * @principle
-     *   Protects user-submitted PII by making writes public but reads privileged.
-     */
     match /waitlist_entries/{waitlistEntryId} {
       allow get: if isAdmin();
       allow list: if isAdmin();
       allow create: if true;
-      allow update: if isAdmin() && resource != null;
-      allow delete: if isAdmin() && resource != null;
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
     }
 
-
-    /**
-     * @description
-     *   Stores a shared timer state that can be read by anyone but only modified
-     *   by authenticated users. This enables real-time synchronization of a
-     *   timer across multiple devices and users while protecting it from anonymous writes.
-     * @path
-     *   /timer_state/{timerStateId}
-     * @allow
-     *   (get) Any visitor, authenticated or not, reads the timer.
-     * @deny
-     *   (create) An unauthenticated, anonymous user attempts to create a timer state.
-     * @principle
-     *   Grants public read access for shared data, but write access is restricted.
-     */
     match /timer_state/{timerStateId} {
-      allow get: if true;
-      allow list: if true;
+      allow read: if true;
       allow create: if true;
-      allow update: if isSignedIn() && resource != null;
-      allow delete: if isSignedIn() && resource != null;
+      allow update, delete: if isSignedIn();
     }
 
-
-    /**
-     * @description
-     *   Defines user roles for administrative access. The mere existence of a
-     *   document with a user's UID as its ID in this collection grants them
-     *   admin privileges throughout the application. This collection is locked
-     *   down to prevent client-side modifications.
-     * @path
-     *   /roles_admin/{uid}
-     * @allow
-     *   (get) A user with uid 'abc' reads their own role document at /roles_admin/abc.
-     * @deny
-     *   (create, update, delete) An admin user attempts to add another user as an admin.
-     * @principle
-     *   Enforces server-side authority for role management by making the collection
-     *   read-only from the client, preventing privilege escalation.
-     */
     match /roles_admin/{uid} {
       allow get: if request.auth.uid == uid;
-      allow list: if false;
-      allow create: if false;
-      allow update: if false;
-      allow delete: if false;
+      allow list, create, update, delete: if false;
     }
 
   }
