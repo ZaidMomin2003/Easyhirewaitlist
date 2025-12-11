@@ -36,36 +36,6 @@
         "email",
         "submissionTimestamp"
       ]
-    },
-    "TimerState": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "TimerState",
-      "type": "object",
-      "description": "Represents the synchronized timer state across all devices.",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the Timer State entity."
-        },
-        "startTime": {
-          "type": "number",
-          "description": "The timestamp when the timer was started (Unix epoch milliseconds)."
-        },
-        "duration": {
-          "type": "number",
-          "description": "The duration of the timer in milliseconds."
-        },
-        "paused": {
-          "type": "boolean",
-          "description": "A flag indicating whether the timer is currently paused."
-        }
-      },
-      "required": [
-        "id",
-        "startTime",
-        "duration",
-        "paused"
-      ]
     }
   },
   "auth": {
@@ -93,22 +63,6 @@
         }
       },
       {
-        "path": "/timer_state/{timerStateId}",
-        "definition": {
-          "entityName": "TimerState",
-          "schema": {
-            "$ref": "#/backend/entities/TimerState"
-          },
-          "description": "Stores the timer state for synchronization across devices. Requires user authentication to read and write.",
-          "params": [
-            {
-              "name": "timerStateId",
-              "description": "Unique identifier for the TimerState document. Can be a constant for a single shared timer."
-            }
-          ]
-        }
-      },
-      {
         "path": "/roles_admin/{uid}",
         "definition": {
           "entityName": "admin",
@@ -125,6 +79,6 @@
         }
       }
     ],
-    "reasoning": "This Firestore data structure is designed to securely store waitlist entries and timer states while adhering to the principles of Authorization Independence, Structural Segregation, and Access Modeling. It leverages denormalization where appropriate to avoid costly `get()` calls in security rules and to ensure atomic operations. Additionally, segregation is employed for admin functions.  The structure supports QAPs by ensuring secure list operations via clear ownership patterns and explicit role definitions.\n\n*   **/waitlist_entries/{waitlistEntryId}**: Stores information collected from the waitlist form.  This collection is publicly writable with server-generated IDs, but requires validation of content. The 'submissionTimestamp' captures the submission time.\n*   **/timer_state/{timerStateId}**: Stores the timer state, allowing synchronization across all devices. This collection enforces that only authenticated users can read and write timer state. The `timerStateId` can be a constant to represent a single, shared timer.\n*   **/roles_admin/{uid}**: This collection uses \"Existence over Content\" to grant admin privileges. The existence of a document with the user's `uid` in this collection signifies admin status. This is checked using `exists()` in the security rules for admin-only data access.\n\nThis structure promotes clear, maintainable security rules due to its explicit ownership and role definitions, and avoids complex hierarchical dependencies.  It also naturally allows for administrative access by checking membership in the `roles_admin` collection."
+    "reasoning": "This Firestore data structure is designed to securely store waitlist entries while adhering to the principles of Authorization Independence, Structural Segregation, and Access Modeling. It leverages denormalization where appropriate to avoid costly `get()` calls in security rules and to ensure atomic operations. Additionally, segregation is employed for admin functions.  The structure supports QAPs by ensuring secure list operations via clear ownership patterns and explicit role definitions.\n\n*   **/waitlist_entries/{waitlistEntryId}**: Stores information collected from the waitlist form.  This collection is publicly writable with server-generated IDs, but requires validation of content. The 'submissionTimestamp' captures the submission time.\n*   **/roles_admin/{uid}**: This collection uses \"Existence over Content\" to grant admin privileges. The existence of a document with the user's `uid` in this collection signifies admin status. This is checked using `exists()` in the security rules for admin-only data access.\n\nThis structure promotes clear, maintainable security rules due to its explicit ownership and role definitions, and avoids complex hierarchical dependencies.  It also naturally allows for administrative access by checking membership in the `roles_admin` collection."
   }
 }

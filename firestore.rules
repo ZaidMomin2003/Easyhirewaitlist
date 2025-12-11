@@ -19,12 +19,6 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
-    match /timer_state/{timerStateId} {
-      allow read: if true;
-      allow create: if true;
-      allow update, delete: if isSignedIn();
-    }
-
     match /roles_admin/{uid} {
       allow get: if request.auth.uid == uid;
       allow list, create, update, delete: if false;

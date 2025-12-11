@@ -2,7 +2,6 @@ import { WaitlistForm } from "@/components/waitlist-form";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Bot } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { CountdownTimer } from "@/components/countdown-timer";
 
 const faqs = [
   {
@@ -46,9 +45,6 @@ export default function Home() {
             Easyhire is an AI platform for B2B businesses to create intelligent hiring campaigns. From resume tests to human-like AI interviews, we find you the perfect candidate.
           </p>
         </div>
-
-        <h2 className="text-2xl font-semibold tracking-tight text-muted-foreground mb-4">Launching in...</h2>
-        <CountdownTimer />
 
         <div className="my-8">
           <WaitlistForm />
