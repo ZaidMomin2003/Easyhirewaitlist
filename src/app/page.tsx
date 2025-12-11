@@ -71,7 +71,10 @@ export default function Home() {
           <div className="bg-primary text-primary-foreground rounded-full p-2">
             <Bot className="w-6 h-6" />
           </div>
-          <span className="text-2xl font-bold">Easyhire</span>
+          <div className="flex items-baseline gap-2">
+            <span className="text-2xl font-bold">Easyhire</span>
+            <span className="text-sm text-muted-foreground font-medium">waitlist</span>
+          </div>
         </header>
         
         <div className="max-w-2xl">
