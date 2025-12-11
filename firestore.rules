@@ -12,8 +12,8 @@ service cloud.firestore {
     }
 
     match /waitlist_entries/{waitlistEntryId} {
-      allow get: if isSignedIn();
-      allow list: if isSignedIn();
+      allow get: if true;
+      allow list: if true;
       allow create: if true;
       allow update: if isSignedIn();
       allow delete: if isSignedIn();
