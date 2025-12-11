@@ -1,6 +1,7 @@
+
 import { WaitlistForm } from "@/components/waitlist-form";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Bot, BrainCircuit, FileText, BarChart3, Users, Zap } from "lucide-react";
+import { Bot, BrainCircuit, FileText, BarChart3, Users, Zap, ScanText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -37,6 +38,11 @@ const features = [
     icon: <FileText className="w-8 h-8 text-primary" />,
     title: "Customizable Skill Tests",
     description: "Tailor assessments for any role, from coding challenges to written tests, to find the perfect match."
+  },
+  {
+    icon: <ScanText className="w-8 h-8 text-primary" />,
+    title: "Holistic Candidate Evaluation",
+    description: "Go beyond the resume. Our AI analyzes LinkedIn profiles, portfolios, and other materials for a truly comprehensive view."
   },
   {
     icon: <Users className="w-8 h-8 text-primary" />,
@@ -84,20 +90,7 @@ export default function Home() {
 
         <section className="w-full max-w-5xl my-16">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {features.slice(0, 3).map((feature, i) => (
-              <Card key={i} className="bg-secondary/30 backdrop-blur-sm border-white/10 text-left">
-                <CardHeader className="flex flex-row items-start gap-4">
-                  <div>{feature.icon}</div>
-                  <CardTitle className="text-xl font-bold leading-tight">{feature.title}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground">{feature.description}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6 md:w-2/3 mx-auto">
-             {features.slice(3).map((feature, i) => (
+            {features.map((feature, i) => (
               <Card key={i} className="bg-secondary/30 backdrop-blur-sm border-white/10 text-left">
                 <CardHeader className="flex flex-row items-start gap-4">
                   <div>{feature.icon}</div>
