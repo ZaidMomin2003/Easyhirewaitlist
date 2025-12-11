@@ -1,7 +1,7 @@
 'use client';
 
 import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
-import { collection } from 'firebase/firestore';
+import { collection, getDocs, query, orderBy } from 'firebase/firestore';
 import {
   Table,
   TableBody,
@@ -14,6 +14,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AlertCircle } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from './ui/alert';
+import { useEffect, useState } from 'react';
 
 interface WaitlistEntry {
   id: string;
@@ -28,11 +29,34 @@ interface WaitlistEntry {
 
 export function ResultsDashboard() {
   const firestore = useFirestore();
-  const waitlistQuery = useMemoFirebase(
-    () => (firestore ? collection(firestore, 'waitlist_entries') : null),
-    [firestore]
-  );
-  const { data: waitlistEntries, isLoading, error } = useCollection<WaitlistEntry>(waitlistQuery);
+  const [waitlistEntries, setWaitlistEntries] = useState<WaitlistEntry[] | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+
+  useEffect(() => {
+    if (!firestore) return;
+
+    const fetchWaitlistEntries = async () => {
+      setIsLoading(true);
+      try {
+        const waitlistCollection = collection(firestore, 'waitlist_entries');
+        const q = query(waitlistCollection, orderBy('submissionTimestamp', 'desc'));
+        const querySnapshot = await getDocs(q);
+        const entries = querySnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        } as WaitlistEntry));
+        setWaitlistEntries(entries);
+      } catch (e: any) {
+        setError(e);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchWaitlistEntries();
+  }, [firestore]);
+
 
   const formatDate = (timestamp: WaitlistEntry['submissionTimestamp']) => {
     if (!timestamp) return 'N/A';
@@ -59,7 +83,7 @@ export function ResultsDashboard() {
               <AlertCircle className="h-4 w-4" />
               <AlertTitle>Error</AlertTitle>
               <AlertDescription>
-                Could not load waitlist entries. Please ensure you have the correct permissions.
+                Could not load waitlist entries. Please ensure you have the correct permissions and the collection 'waitlist_entries' exists.
               </AlertDescription>
             </Alert>
           )}

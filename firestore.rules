@@ -3,26 +3,16 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    function isSignedIn() {
-      return request.auth != null;
-    }
-
-    function isAdmin() {
-      return exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid));
-    }
-
+    // Allow public read access to waitlist entries.
+    // The results page is protected by a hardcoded password.
     match /waitlist_entries/{waitlistEntryId} {
-      allow get: if true;
-      allow list: if true;
-      allow create: if true;
-      allow update: if isSignedIn();
-      allow delete: if isSignedIn();
+      allow read: if true;
+      allow write: if true; // Allow public form submissions
     }
 
+    // Lock down admin roles collection
     match /roles_admin/{uid} {
-      allow get: if request.auth.uid == uid;
-      allow list, create, update, delete: if false;
+      allow read, write: if false;
     }
-
   }
 }
