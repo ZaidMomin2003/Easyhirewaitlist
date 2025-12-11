@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useCollection, useUser, useAuth, useMemoFirebase } from '@/firebase';
-import { collection } from 'firebase/firestore';
+import { collection, doc, getDoc } from 'firebase/firestore';
 import { useFirestore } from '@/firebase';
 import { AdminLoginForm } from '@/components/admin-login-form';
 import { Button } from '@/components/ui/button';
@@ -99,7 +99,27 @@ function AdminDashboard() {
 
 export default function AdminPage() {
   const { user, isUserLoading } = useUser();
+  const firestore = useFirestore();
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    const checkAdminStatus = async () => {
+      if (user && firestore) {
+        try {
+          const adminDocRef = doc(firestore, 'roles_admin', user.uid);
+          const adminDoc = await getDoc(adminDocRef);
+          setIsAdmin(adminDoc.exists());
+        } catch (error) {
+          console.error('Error checking admin status:', error);
+          setIsAdmin(false);
+        }
+      } else if (!isUserLoading) {
+        setIsAdmin(false);
+      }
+    };
+
+    checkAdminStatus();
+  }, [user, isUserLoading, firestore]);
 
   if (isUserLoading || isAdmin === null) {
     return (
@@ -109,7 +129,7 @@ export default function AdminPage() {
     );
   }
 
-  if (!user) {
+  if (!user || !isAdmin) {
     return <AdminLoginForm />;
   }
 
