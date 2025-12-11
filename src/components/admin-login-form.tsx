@@ -28,8 +28,8 @@ export function AdminLoginForm() {
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(AdminLoginFormSchema),
     defaultValues: {
-      email: '',
-      password: '',
+      email: ADMIN_EMAIL,
+      password: ADMIN_PASSWORD,
     },
   });
 
@@ -103,7 +103,7 @@ export function AdminLoginForm() {
               />
               <Button type="submit" className="w-full" disabled={isPending}>
                 {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Sign In
+                Login
               </Button>
             </form>
           </Form>
