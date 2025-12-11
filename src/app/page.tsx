@@ -114,7 +114,7 @@ export default function Home() {
             <span className="text-muted-foreground text-sm tracking-widest">FROM THE DEVELOPERS OF</span>
             <div className="flex-grow border-t border-muted-foreground/20"></div>
           </div>
-          <div className="flex justify-center items-center gap-4 md:gap-8 mt-6">
+          <div className="flex flex-col md:flex-row justify-center items-center gap-4 md:gap-8 mt-6">
             <Button variant="link" asChild className="text-2xl font-semibold italic text-muted-foreground">
               <a href="https://wisdomis.fun" target="_blank" rel="noopener noreferrer">wisdomis.fun</a>
             </Button>
