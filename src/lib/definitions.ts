@@ -8,13 +8,5 @@ export const WaitlistFormSchema = z.object({
 
 export const AdminLoginFormSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email." }),
-  password: z.string().min(6, { message: "Password must be at least 6 characters." }),
-}).refine(data => {
-  if (data.email.toLowerCase() === 'admin@example.com') {
-    return data.password === 'Zaisha@226194';
-  }
-  return true;
-}, {
-  message: "Invalid credentials.",
-  path: ["password"],
+  password: z.string().min(1, { message: "Please enter a password." }),
 });

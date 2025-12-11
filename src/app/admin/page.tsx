@@ -1,8 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useCollection, useUser, useAuth, useMemoFirebase } from '@/firebase';
-import { collection, doc, getDoc } from 'firebase/firestore';
+import { useState } from 'react';
+import { useCollection, useMemoFirebase } from '@/firebase';
+import { collection } from 'firebase/firestore';
 import { useFirestore } from '@/firebase';
 import { AdminLoginForm } from '@/components/admin-login-form';
 import { Button } from '@/components/ui/button';
@@ -52,17 +52,12 @@ function WaitlistTable({ waitlistData }: { waitlistData: WaitlistEntry[] }) {
   );
 }
 
-function AdminDashboard() {
-  const auth = useAuth();
+function AdminDashboard({ onSignOut }: { onSignOut: () => void }) {
   const firestore = useFirestore();
   const waitlistCollection = useMemoFirebase(() => 
     firestore ? collection(firestore, 'waitlist_entries') : null
   , [firestore]);
   const { data: waitlistData, isLoading: isWaitlistLoading } = useCollection<WaitlistEntry>(waitlistCollection);
-
-  const handleSignOut = () => {
-    auth.signOut();
-  };
 
   if (isWaitlistLoading) {
     return (
@@ -89,49 +84,19 @@ function AdminDashboard() {
     <div className="w-full p-8">
       <div className="flex justify-between items-center mb-6">
          <div></div>
-        <Button onClick={handleSignOut} variant="outline">Sign Out</Button>
+        <Button onClick={onSignOut} variant="outline">Sign Out</Button>
       </div>
       {waitlistData && <WaitlistTable waitlistData={waitlistData} />}
     </div>
   );
 }
 
-
 export default function AdminPage() {
-  const { user, isUserLoading } = useUser();
-  const firestore = useFirestore();
-  const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  useEffect(() => {
-    const checkAdminStatus = async () => {
-      if (user && firestore) {
-        try {
-          const adminDocRef = doc(firestore, 'roles_admin', user.uid);
-          const adminDoc = await getDoc(adminDocRef);
-          setIsAdmin(adminDoc.exists());
-        } catch (error) {
-          console.error('Error checking admin status:', error);
-          setIsAdmin(false);
-        }
-      } else if (!isUserLoading) {
-        setIsAdmin(false);
-      }
-    };
-
-    checkAdminStatus();
-  }, [user, isUserLoading, firestore]);
-
-  if (isUserLoading || isAdmin === null) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Skeleton className="w-96 h-96" />
-      </div>
-    );
+  if (!isLoggedIn) {
+    return <AdminLoginForm onLoginSuccess={() => setIsLoggedIn(true)} />;
   }
 
-  if (!user || !isAdmin) {
-    return <AdminLoginForm />;
-  }
-
-  return <AdminDashboard />;
+  return <AdminDashboard onSignOut={() => setIsLoggedIn(false)} />;
 }
